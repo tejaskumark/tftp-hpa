@@ -1734,13 +1734,10 @@ static int validate_access(char *filename, int mode,
             {
                 return ENOTFOUND;
             }
-            syslog(LOG_INFO, "File name after. %s", filename);
             break;
         case ENOSPC:
-            syslog(LOG_INFO, "Entering ENOSPC");
             return ENOSPACE;
         case EEXIST:
-            syslog(LOG_INFO, "Exists inside.");
             return EEXISTS;
         default:
             return errno + 100;
