@@ -1718,7 +1718,6 @@ static int validate_access(char *filename, int mode,
     strcat(newfname, timestring);
     rename(filename, newfname);
     fd = open(filename, mode == RRQ ? rmode : wmode, 0666);
-    syslog(LOG_INFO, "FD:%d mode:%d", fd);
     if (fd < 0)
     {
         switch (errno)
