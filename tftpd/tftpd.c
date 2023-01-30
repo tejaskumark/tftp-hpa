@@ -1571,10 +1571,8 @@ static char *rewrite_access(char *filename, int mode, const char **msg)
 #endif
 
 #ifdef _WIN32
-const char SEP = '\\';
 const char *SEPS = "\\";
 #else
-const char SEP = '/';
 const char *SEPS = "/";
 #endif
 
@@ -1591,13 +1589,14 @@ static int create_dir(char *filename)
 {
     /* Remove filename from last delimiter */
     char *tmp = filename;
-    char *ptr = strrchr(tmp, SEP);
+    char *ptr = strrchr(tmp, *SEPS);
     if (ptr)
     {
+        /* Adding end of string at ptr, so tmp will have only dir part */
         *ptr = '\0';
         if (strlen(tmp) > 256)
         {
-            syslog(LOG_INFO, "Directory characters exceeding max length 256.");
+            syslog(LOG_INFO, "Directory characters including(%s) exceeding max length 256.", SEPS);
             return 0;
         }
     }
@@ -1633,10 +1632,11 @@ static int create_dir(char *filename)
         {
             if (errno != EEXIST)
             {
-                syslog(LOG_INFO, "Error creating dir: %s", tmp);
+                syslog(LOG_INFO, "Error creating dir: %s", tmpdir);
                 return 0;
             }
         }
+        syslog(LOG_INFO, "Success Dir: %s", tmpdir);
 #endif
         split_string = strtok(NULL, SEPS);
     }
