@@ -25,3 +25,10 @@ subscribe, go to the list subscription page at:
 
    http://www.zytor.com/mailman/listinfo/syslinux
 
+
+====> Some Extra Steps <====
+
+apt-get install autotools-dev libwrap0-dev po-debconf make autoconf build-essential gcc
+./configure
+autoconf configure.in
+autoreconf -i
