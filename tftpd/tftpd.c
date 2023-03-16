@@ -1713,10 +1713,17 @@ static int validate_access(char *filename, int mode,
 #endif
     char timestring[255];
     char newfname[512];
-    get_time_string(timestring);
-    strcpy(newfname, filename);
-    strcat(newfname, timestring);
-    rename(filename, newfname);
+    // Need to check RRQ first as, we don't need to do anything if
+    // mode is RRQ. Otherwise it tries to create directory in get request
+    // as well.
+    if (mode != RRQ)
+    {
+        syslog(LOG_INFO, "Received WRQ. File will rename if already exists.");
+        get_time_string(timestring);
+        strcpy(newfname, filename);
+        strcat(newfname, timestring);
+        rename(filename, newfname);
+    }
     fd = open(filename, mode == RRQ ? rmode : wmode, 0666);
     if (fd < 0)
     {
@@ -1724,8 +1731,16 @@ static int validate_access(char *filename, int mode,
         {
         case ENOENT:
         case ENOTDIR:
+            // Need to check RRQ first as, we don't need to do anything if
+            // mode is RRQ. Otherwise it tries to create directory in get request
+            // as well.
+            if (mode == RRQ)
+            {
+                return ENOTFOUND;
+            }
             if (!makedir || !cancreate)
             {
+                syslog(LOG_INFO, "No makedir.");
                 return ENOTFOUND;
             }
             syslog(LOG_INFO, "makedir enabled. Creating directory: %s", filename);
